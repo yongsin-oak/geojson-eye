@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GeoJSON Eye — Map</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <aside id="left-menu" class="panel">
+        <div class="logo">GeoJSON</div>
+        <nav class="icons">
+          <button class="icon-btn" data-action="rain" title="ฝนตก">
+            <!-- raindrop svg -->
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path
+                d="M12 2s-4 4-4 7a4 4 0 0 0 8 0c0-3-4-7-4-7z"
+                fill="currentColor"
+              />
+            </svg>
+            <span>ฝน</span>
+          </button>
+          <button class="icon-btn" data-action="storm" title="พายุ">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path
+                d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"
+                fill="currentColor"
+              />
+            </svg>
+            <span>พายุ</span>
+          </button>
+          <button class="icon-btn" data-action="wind" title="ลม">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path
+                d="M3 12a4 4 0 1 1 4 4h10"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span>ลม</span>
+          </button>
+          <button class="icon-btn" data-action="clear" title="แจ่มใส">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" fill="currentColor" />
+            </svg>
+            <span>แจ่ม</span>
+          </button>
+        </nav>
+        <div class="left-footer">คลิกไอคอนเพื่อแสดง/ซ่อน</div>
+      </aside>
+
+      <main id="map-area">
+        <div id="map"></div>
+      </main>
+
+      <aside id="right-panel" class="panel">
+        <div class="panel-header">
+          <h3>Layer data</h3>
+          <small>เลือก layer ที่ต้องการแสดง</small>
+        </div>
+
+        <div class="layer-list">
+          <label class="layer-item"
+            ><input type="checkbox" id="layer-hospitals" checked /> โรงพยาบาล
+            (WFS)</label
+          >
+        </div>
+
+        <div class="filter-box">
+          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--muted)">
+            ค้นหา / กรอง
+          </h4>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 8px;
+              margin-bottom: 8px;
+            "
+          >
+            <input id="filter-name" type="text" placeholder="ชื่อโรงพยาบาล" />
+            <select id="filter-district" aria-label="อำเภอ">
+              <option value="">-- ทุกอำเภอ --</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button id="btn-apply-filter" type="button" class="filter-btn">
+              Apply
+            </button>
+            <button
+              id="btn-clear-filter"
+              type="button"
+              class="filter-btn secondary"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div class="add-hospital">
+          <h4>เพิ่มโรงพยาบาลใหม่</h4>
+          <form id="hospital-form">
+            <input type="text" name="name_th" placeholder="ชื่อไทย" required />
+            <input type="text" name="name_en" placeholder="ชื่ออังกฤษ" />
+            <select name="district" id="form-district">
+              <option value="">-- เลือกอำเภอ --</option>
+            </select>
+            <input type="text" name="address" placeholder="ที่อยู่" />
+            <input
+              type="number"
+              step="any"
+              name="lat"
+              placeholder="Latitude"
+              required
+            />
+            <input
+              type="number"
+              step="any"
+              name="lon"
+              placeholder="Longitude"
+              required
+            />
+            <input type="text" name="source" placeholder="แหล่งที่มา" />
+            <input type="hidden" name="mode" id="form-mode" value="insert" />
+            <input type="hidden" name="fid" id="form-fid" value="" />
+            <div class="form-actions">
+              <button
+                type="button"
+                id="form-cancel"
+                class="cancel-btn"
+                style="display: none"
+              >
+                Cancel
+              </button>
+              <button type="submit" id="form-submit" class="submit-btn">
+                Add Hospital
+              </button>
+            </div>
+          </form>
+          <div id="form-msg" style="color: #fbb">&nbsp;</div>
+        </div>
+      </aside>
+    </div>
+
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <script src="script.js"></script>
+  </body>
+</html>

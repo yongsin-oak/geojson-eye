@@ -1,0 +1,145 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลพุทธชินราช",
+        "name_en": "Buddhachinaraj Phitsanulok Hospital",
+        "district": "เมืองพิษณุโลก",
+        "address": "90 ถนนศรีธรรมไตรปิฎก ต.ในเมือง",
+        "source": "th.wikipedia / GIS MOPH (turn2search5, turn2search7)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.263549, 16.808436]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลพิษณุโลก ฮอสพิทอล",
+        "name_en": "Phitsanulok Hospital (Phitsanuloke Hospital)",
+        "district": "เมืองพิษณุโลก",
+        "address": "262/55 ถ.บรมไตรโลกนารถ ต.ในเมือง",
+        "source": "TokioMarine locator / AIA list (turn0search1, turn2search9)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.255125, 16.805824]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลพิษณุเวช (พิษณุเวช)",
+        "name_en": "Pitsanuvej Hospital",
+        "district": "เมืองพิษณุโลก",
+        "address": "211 ถนนขุนพิเรนทรเทพ ต.ในเมือง",
+        "source": "TokioMarine locator (turn0search3)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.259872, 16.808367]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลกรุงเทพ พิษณุโลก",
+        "name_en": "Bangkok Hospital Phitsanulok",
+        "district": "เมืองพิษณุโลก",
+        "address": "138 ถนนพระองค์ดำ ต.ในเมือง",
+        "source": "AIA / YellowPages / Hospital website (turn8search4, turn8search1)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.27257, 16.81646]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลรวมแพทย์ พิษณุโลก",
+        "name_en": "Ruamphat Phitsanulok Hospital",
+        "district": "เมืองพิษณุโลก",
+        "address": "224/30 ถนนบรมไตรโลกนารถ ต.ในเมือง",
+        "source": "ruamphat / emergency-thailand (turn4search3)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.25967480295303, 16.80973796833566]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลเนินมะปราง",
+        "name_en": "Noen Maprang Hospital",
+        "district": "เนินมะปราง",
+        "address": "364 หมู่ 2 ต.เนินมะปราง",
+        "source": "Emergency-thailand (turn5search3)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.62361241277, 16.56229576979]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลพรหมพิราม",
+        "name_en": "Phrom Phiram Hospital",
+        "district": "พรหมพิราม",
+        "address": "479 หมู่ 1 ต.พรหมพิราม",
+        "source": "PhromPhiram official / emergency-thailand (turn5search13)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.20110603340979, 17.034854021287394]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลวังทอง",
+        "name_en": "Wang Thong Hospital",
+        "district": "วังทอง",
+        "address": "491 หมู่ 5 ต.วังทอง",
+        "source": "AIA provider xlsx / Longdo / local sources (turn10search12, turn10search0)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.4329456, 16.8387971]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลพระยุพราชนครไทย",
+        "name_en": "Phra Yupparat Nakhonthai Hospital",
+        "district": "นครไทย",
+        "address": "ตำบล นครไทย",
+        "source": "จังหวัด/ตำบล ศูนย์ข้อมูล (approx. town center)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.844, 17.206]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name_th": "โรงพยาบาลรังสิต (ตัวอย่างอื่น)",
+        "name_en": "Radiotherapy and Nuclear Medicine Hospital (example)",
+        "district": "เมืองพิษณุโลก",
+        "address": "โรงพยาบาลวิชาการ/หน่วยงานพิเศษ",
+        "source": "จังหวัดรายการโรงพยาบาล (approximation)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [100.266, 16.812]
+      }
+    }
+  ]
+}
