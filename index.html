@@ -11,123 +11,343 @@
     />
     <link
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link
+      rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""
     />
-
     <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              dark: {
+                bg: "#0f1724",
+                panel: "#1a2332",
+                border: "#2d3748",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style type="text/tailwindcss">
+      @layer utilities {
+        .glass {
+          @apply bg-white/5 backdrop-blur-md border border-white/10;
+        }
+        .glass-hover {
+          @apply hover:bg-white/10 transition-all duration-200;
+        }
+      }
+    </style>
   </head>
-  <body>
-    <div id="app">
-      <aside id="left-menu" class="panel">
-        <div class="logo">GeoJSON</div>
-        <nav class="icons">
-          <button class="icon-btn" data-action="rain" title="ฝนตก">
-            <!-- raindrop svg -->
-            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+  <body
+    class="dark bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 font-['Inter']"
+  >
+    <div class="h-screen grid grid-cols-[280px_1fr_380px] gap-4 p-4">
+      <!-- Left Panel - Legend -->
+      <aside class="glass rounded-2xl p-6 flex flex-col gap-6 shadow-2xl">
+        <div class="text-center">
+          <h1
+            class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            GeoJSON Eye
+          </h1>
+          <p class="text-xs text-gray-400 mt-1">ระบบแผนที่ข้อมูล GIS</p>
+        </div>
+
+        <!-- Legend / คำอธิบายสัญลักษณ์ -->
+        <div class="space-y-3">
+          <h3
+            class="text-sm font-semibold text-gray-300 flex items-center gap-2"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
-                d="M12 2s-4 4-4 7a4 4 0 0 0 8 0c0-3-4-7-4-7z"
-                fill="currentColor"
-              />
-            </svg>
-            <span>ฝน</span>
-          </button>
-          <button class="icon-btn" data-action="storm" title="พายุ">
-            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-              <path
-                d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"
-                fill="currentColor"
-              />
-            </svg>
-            <span>พายุ</span>
-          </button>
-          <button class="icon-btn" data-action="wind" title="ลม">
-            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-              <path
-                d="M3 12a4 4 0 1 1 4 4h10"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <span>ลม</span>
-          </button>
-          <button class="icon-btn" data-action="clear" title="แจ่มใส">
-            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
-              <circle cx="12" cy="12" r="4" fill="currentColor" />
-            </svg>
-            <span>แจ่ม</span>
-          </button>
-        </nav>
-        <div class="left-footer">คลิกไอคอนเพื่อแสดง/ซ่อน</div>
+            คำอธิบายสัญลักษณ์
+          </h3>
+
+          <!-- Hospital Legend -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 text-xs">
+              <i
+                class="fa-solid fa-hospital w-4 text-center text-fuchsia-400"
+              ></i>
+              <span class="text-gray-300">โรงพยาบาล (สีม่วง)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <div
+                class="w-4 h-4 rounded bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold"
+                style="font-size: 8px"
+              >
+                32°
+              </div>
+              <span class="text-gray-300">อุณหภูมิจังหวัด (°C)</span>
+            </div>
+          </div>
+
+          <!-- Weather Icon -->
+          <div class="space-y-2 pt-2 border-t border-gray-700">
+            <div class="flex items-center gap-2 text-xs">
+              <i class="fa-solid fa-cloud w-4 text-center text-sky-400"></i>
+              <span class="text-gray-300">สภาพอากาศปัจจุบัน</span>
+            </div>
+          </div>
+
+          <!-- UV Index Legend -->
+          <div class="space-y-2 pt-2 border-t border-gray-700">
+            <div class="flex items-center gap-2 text-xs mb-2">
+              <i class="fa-solid fa-sun w-4 text-center text-amber-400"></i>
+              <span class="text-gray-400 font-medium">UV Index</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              <span class="text-gray-300">ต่ำ (0-2)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <span class="text-gray-300">ปานกลาง (3-5)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+              <span class="text-gray-300">สูง (6-7)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-4 h-4 rounded-full bg-red-500"></div>
+              <span class="text-gray-300">สูงมาก/อันตราย (&gt;8)</span>
+            </div>
+          </div>
+
+          <!-- Air Quality Legend -->
+          <div class="space-y-2 pt-2 border-t border-gray-700">
+            <div class="flex items-center gap-2 text-xs mb-2">
+              <i class="fa-solid fa-wind w-4 text-center text-emerald-400"></i>
+              <span class="text-gray-400 font-medium">คุณภาพอากาศ (AQI)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              <span class="text-gray-300">ดี (0-50)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <span class="text-gray-300">ปานกลาง (51-100)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+              <span class="text-gray-300">มีผลต่อสุขภาพ (101-150)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-red-500"></div>
+              <span class="text-gray-300">ไม่ดี (&gt;150)</span>
+            </div>
+          </div>
+
+          <!-- Earthquake Legend -->
+          <div class="space-y-2 pt-2 border-t border-gray-700">
+            <div class="flex items-center gap-2 text-xs mb-2">
+              <i
+                class="fa-solid fa-house-crack w-4 text-center text-amber-400"
+              ></i>
+              <span class="text-gray-400 font-medium">ขนาดแผ่นดินไหว</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+              <span class="text-gray-300">เล็ก (&lt;4.0)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+              <span class="text-gray-300">ปานกลาง (4.0-6.0)</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs pl-6">
+              <div class="w-4 h-4 rounded-full bg-red-500"></div>
+              <span class="text-gray-300">ใหญ่ (&gt;6.0)</span>
+            </div>
+          </div>
+        </div>
       </aside>
 
-      <main id="map-area">
-        <div id="map"></div>
+      <!-- Map Area -->
+      <main class="glass rounded-2xl overflow-hidden shadow-2xl relative">
+        <div id="map" class="w-full h-full"></div>
+
+        <!-- Active Layers Panel (ย้ายไปซ้ายบน) -->
+        <div
+          class="absolute top-4 left-4 glass rounded-xl p-3 max-w-xs shadow-xl"
+        >
+          <div
+            class="text-xs font-semibold text-gray-300 mb-2 flex items-center gap-2"
+          >
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+              />
+            </svg>
+            Layer ที่เปิดใช้งาน
+          </div>
+          <div
+            id="active-layers-display"
+            class="space-y-1 text-xs text-gray-400"
+          >
+            <div class="text-gray-500 italic">ไม่มี layer ที่เปิด</div>
+          </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div
+          id="loading-overlay"
+          class="absolute inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50"
+        >
+          <div class="glass rounded-2xl p-6 text-center">
+            <svg
+              class="animate-spin h-12 w-12 mx-auto mb-4 text-indigo-400"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <div class="text-white font-medium" id="loading-text">
+              กำลังโหลดข้อมูล...
+            </div>
+            <div class="text-gray-400 text-sm mt-1" id="loading-detail"></div>
+          </div>
+        </div>
       </main>
 
-      <aside id="right-panel" class="panel">
-        <div class="panel-header">
-          <h3>Layer data</h3>
-          <small>เลือก layer ที่ต้องการแสดง</small>
+      <!-- Right Panel -->
+      <aside
+        class="glass rounded-2xl p-6 flex flex-col gap-6 shadow-2xl overflow-y-auto"
+      >
+        <!-- Region Selector (แสดงเฉพาะเมื่อเปิด layer ที่เกี่ยวข้อง) -->
+        <div id="region-selector-container" class="glass rounded-xl p-4 hidden">
+          <label
+            class="text-xs font-medium text-gray-400 uppercase tracking-wide block mb-2"
+          >
+            เลือกภาค
+          </label>
+          <select
+            id="region-selector"
+            class="w-full px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all cursor-pointer hover:bg-slate-700/70"
+          >
+            <option value="all">ทั้งหมด (77 จังหวัด)</option>
+            <option value="north">ภาคเหนือ (9)</option>
+            <option value="central">ภาคกลาง (22)</option>
+            <option value="northeast">ภาคตะวันออกเฉียงเหนือ (19)</option>
+            <option value="east">ภาคตะวันออก (7)</option>
+            <option value="west">ภาคตะวันตก (5)</option>
+            <option value="south">ภาคใต้ (14)</option>
+          </select>
         </div>
 
-        <div class="layer-list">
-          <label class="layer-item"
-            ><input type="checkbox" id="layer-hospitals" checked /> โรงพยาบาล
-            (WFS)</label
-          >
-        </div>
-
-        <div class="filter-box">
-          <h4 style="margin: 0 0 8px 0; font-size: 14px; color: var(--muted)">
-            ค้นหา / กรอง
-          </h4>
-          <div
-            style="
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 8px;
-              margin-bottom: 8px;
-            "
-          >
-            <input id="filter-name" type="text" placeholder="ชื่อโรงพยาบาล" />
-            <select id="filter-district" aria-label="อำเภอ">
+        <div class="glass rounded-xl p-4">
+          <h4 class="font-semibold mb-3 text-sm">ค้นหา / กรอง</h4>
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <input
+              id="filter-name"
+              type="text"
+              placeholder="ชื่อโรงพยาบาล"
+              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <select
+              id="filter-district"
+              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer"
+            >
               <option value="">-- ทุกอำเภอ --</option>
             </select>
           </div>
-          <div style="display: flex; gap: 8px">
-            <button id="btn-apply-filter" type="button" class="filter-btn">
+          <div class="flex gap-2">
+            <button
+              id="btn-apply-filter"
+              class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors"
+            >
               Apply
             </button>
             <button
               id="btn-clear-filter"
-              type="button"
-              class="filter-btn secondary"
+              class="px-3 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm transition-colors"
             >
               Clear
             </button>
           </div>
         </div>
 
-        <div class="add-hospital">
-          <h4>เพิ่มโรงพยาบาลใหม่</h4>
-          <form id="hospital-form">
-            <input type="text" name="name_th" placeholder="ชื่อไทย" required />
-            <input type="text" name="name_en" placeholder="ชื่ออังกฤษ" />
-            <select name="district" id="form-district">
+        <!-- Add Hospital Form -->
+        <div class="glass rounded-xl p-4">
+          <h4 class="font-semibold mb-3 text-sm">เพิ่มโรงพยาบาลใหม่</h4>
+          <form id="hospital-form" class="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              name="name_th"
+              placeholder="ชื่อไทย"
+              required
+              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="name_en"
+              placeholder="ชื่ออังกฤษ"
+              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <select
+              name="district"
+              id="form-district"
+              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+            >
               <option value="">-- เลือกอำเภอ --</option>
             </select>
-            <input type="text" name="address" placeholder="ที่อยู่" />
+            <input
+              type="text"
+              name="address"
+              placeholder="ที่อยู่"
+              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
             <input
               type="number"
               step="any"
               name="lat"
               placeholder="Latitude"
               required
+              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="number"
@@ -135,25 +355,34 @@
               name="lon"
               placeholder="Longitude"
               required
+              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
-            <input type="text" name="source" placeholder="แหล่งที่มา" />
+            <input
+              type="text"
+              name="source"
+              placeholder="แหล่งที่มา"
+              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
             <input type="hidden" name="mode" id="form-mode" value="insert" />
             <input type="hidden" name="fid" id="form-fid" value="" />
-            <div class="form-actions">
+            <div class="col-span-2 flex gap-2 mt-2">
               <button
                 type="button"
                 id="form-cancel"
-                class="cancel-btn"
-                style="display: none"
+                class="px-3 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm transition-colors hidden"
               >
                 Cancel
               </button>
-              <button type="submit" id="form-submit" class="submit-btn">
+              <button
+                type="submit"
+                id="form-submit"
+                class="flex-1 px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg text-sm font-medium transition-all shadow-lg"
+              >
                 Add Hospital
               </button>
             </div>
           </form>
-          <div id="form-msg" style="color: #fbb">&nbsp;</div>
+          <div id="form-msg" class="mt-2 text-xs text-red-400">&nbsp;</div>
         </div>
       </aside>
     </div>
@@ -163,6 +392,24 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+    <!-- Province data -->
+    <script src="thailand-provinces.js"></script>
+
+    <!-- App modules -->
+    <script src="js/config.js"></script>
+    <script src="js/regions.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/cache-manager.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/geoserver-api.js"></script>
+    <script src="js/hospital-manager.js"></script>
+    <script src="js/weather-manager.js"></script>
+    <script src="js/uv-manager.js"></script>
+    <script src="js/air-quality-manager.js"></script>
+    <script src="js/earthquake-manager.js"></script>
+
+    <!-- Main application -->
     <script src="script.js"></script>
   </body>
 </html>
