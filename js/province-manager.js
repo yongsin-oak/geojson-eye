@@ -3,15 +3,10 @@ class ProvinceManager {
   constructor(map, provinceLayer) {
     this.map = map;
     this.provinceLayer = provinceLayer;
-    this.isLoaded = false;
   }
 
   async loadProvinces() {
     try {
-      if (this.isLoaded) {
-        console.log("เส้นแบ่งจังหวัดโหลดแล้ว");
-        return;
-      }
 
       console.log("กำลังโหลดเส้นแบ่งจังหวัด...");
       this.provinceLayer.clearLayers();
@@ -88,7 +83,6 @@ class ProvinceManager {
         },
       }).addTo(this.provinceLayer);
 
-      this.isLoaded = true;
       console.log("โหลดเส้นแบ่งจังหวัดเสร็จสิ้น");
     } catch (err) {
       console.error("Error loading provinces:", err);
@@ -98,7 +92,6 @@ class ProvinceManager {
 
   clearProvinces() {
     this.provinceLayer.clearLayers();
-    this.isLoaded = false;
     console.log("ลบเส้นแบ่งจังหวัดแล้ว");
   }
 }

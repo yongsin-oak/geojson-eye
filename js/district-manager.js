@@ -3,15 +3,10 @@ class DistrictManager {
   constructor(map, districtLayer) {
     this.map = map;
     this.districtLayer = districtLayer;
-    this.isLoaded = false;
   }
 
   async loadDistricts() {
     try {
-      if (this.isLoaded) {
-        console.log("เส้นแบ่งอำเภอโหลดแล้ว");
-        return;
-      }
 
       console.log("กำลังโหลดเส้นแบ่งอำเภอ...");
       this.districtLayer.clearLayers();
@@ -82,7 +77,6 @@ class DistrictManager {
         },
       }).addTo(this.districtLayer);
 
-      this.isLoaded = true;
       console.log("โหลดเส้นแบ่งอำเภอเสร็จสิ้น");
     } catch (err) {
       console.error("Error loading districts:", err);
@@ -92,7 +86,6 @@ class DistrictManager {
 
   clearDistricts() {
     this.districtLayer.clearLayers();
-    this.isLoaded = false;
     console.log("ลบเส้นแบ่งอำเภอแล้ว");
   }
 }
