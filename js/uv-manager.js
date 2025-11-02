@@ -50,10 +50,6 @@ class UVManager {
 
   async loadUVIndex() {
     try {
-      this.uiManager.showLoading(
-        "กำลังโหลด UV Index",
-        "ตรวจสอบระดับรังสี UV..."
-      );
       this.floodLayer.clearLayers();
       const provinces = getProvincesByRegion(this.currentRegion);
       console.log(`⏳ กำลังโหลด UV Index ${provinces.length} จังหวัด...`);
@@ -66,7 +62,6 @@ class UVManager {
           this.currentRegion
         );
         cachedCircles.forEach((circle) => this.floodLayer.addLayer(circle));
-        this.uiManager.hideLoading();
         return;
       }
 
@@ -165,10 +160,8 @@ class UVManager {
 
       this.cacheManager.set("flood", this.currentRegion, validCircles);
 
-      this.uiManager.hideLoading();
       console.log(`โหลด UV Index: ${provinces.length} จังหวัด`);
     } catch (err) {
-      this.uiManager.hideLoading();
       console.error("UV Index API error:", err);
     }
   }

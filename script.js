@@ -28,24 +28,28 @@ document.addEventListener("DOMContentLoaded", function () {
   if (regionSelector) regionSelector.value = DEFAULT_REGION;
 
   map.createPane("hospitalPane");
+  map.createPane("studentPane");
   map.createPane("weatherPane");
   map.createPane("floodPane");
   map.createPane("airPane");
   map.createPane("quakesPane");
 
   map.getPane("hospitalPane").style.zIndex = 650;
+  map.getPane("studentPane").style.zIndex = 645;
   map.getPane("weatherPane").style.zIndex = 640;
   map.getPane("floodPane").style.zIndex = 630;
   map.getPane("airPane").style.zIndex = 620;
   map.getPane("quakesPane").style.zIndex = 610;
 
   const hospitalsLayer = L.layerGroup([], { pane: "hospitalPane" });
+  const studentsLayer = L.layerGroup([], { pane: "studentPane" });
   const weatherLayer = L.layerGroup([], { pane: "weatherPane" });
   const floodLayer = L.layerGroup([], { pane: "floodPane" });
   const airLayer = L.layerGroup([], { pane: "airPane" });
   const quakesLayer = L.layerGroup([], { pane: "quakesPane" });
 
   const hospitalManager = new HospitalManager(map, hospitalsLayer, uiManager);
+  const studentManager = new StudentManager(map, studentsLayer, uiManager);
   const weatherManager = new WeatherManager(
     weatherLayer,
     uiManager,
@@ -92,6 +96,17 @@ document.addEventListener("DOMContentLoaded", function () {
           key: "hospitals",
           layer: hospitalsLayer,
           loadFn: () => hospitalManager.loadHospitals(),
+        },
+        {
+          name: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="vertical-align:middle;">
+            <circle cx="12" cy="12" r="11" stroke="white" stroke-width="2"/>
+            <path d="M12 6C10.34 6 9 7.34 9 9C9 10.66 10.34 12 12 12C13.66 12 15 10.66 15 9C15 7.34 13.66 6 12 6Z" fill="white"/>
+            <path d="M12 13C9.33 13 7 14.34 7 16V18H17V16C17 14.34 14.67 13 12 13Z" fill="white"/>
+          </svg>`,
+          title: "นักเรียน",
+          key: "students",
+          layer: studentsLayer,
+          loadFn: () => studentManager.loadStudents(),
         },
         {
           name: `<i class="fa-solid fa-cloud"></i>`,
@@ -239,9 +254,39 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Student Filter Controls
+  const studentFilterName = document.getElementById("student-filter-name");
+  const studentFilterId = document.getElementById("student-filter-id");
+  const btnApplyStudentFilter = document.getElementById(
+    "btn-apply-student-filter"
+  );
+  const btnClearStudentFilter = document.getElementById(
+    "btn-clear-student-filter"
+  );
+
+  if (btnApplyStudentFilter) {
+    btnApplyStudentFilter.addEventListener("click", () => {
+      const name = studentFilterName ? studentFilterName.value.trim() : "";
+      const id = studentFilterId ? studentFilterId.value.trim() : "";
+      studentManager.loadStudents({ name, id });
+    });
+  }
+
+  if (btnClearStudentFilter) {
+    btnClearStudentFilter.addEventListener("click", () => {
+      if (studentFilterName) studentFilterName.value = "";
+      if (studentFilterId) studentFilterId.value = "";
+      studentManager.loadStudents();
+    });
+  }
+
   const form = document.getElementById("hospital-form");
   const msg = document.getElementById("form-msg");
   const formCancelBtn = document.getElementById("form-cancel");
+
+  const studentForm = document.getElementById("student-form");
+  const studentMsg = document.getElementById("student-form-msg");
+  const studentFormCancelBtn = document.getElementById("student-form-cancel");
 
   if (form && formCancelBtn) {
     formCancelBtn.addEventListener("click", () => {
@@ -255,13 +300,87 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  if (studentForm && studentFormCancelBtn) {
+    studentFormCancelBtn.addEventListener("click", () => {
+      studentForm.reset();
+      document.getElementById("student-form-mode").value = "insert";
+      document.getElementById("student-form-fid").value = "";
+      document.getElementById("student-form-submit").textContent =
+        "Add Student";
+      studentFormCancelBtn.style.display = "none";
+      if (studentMsg) studentMsg.textContent = "";
+    });
+  }
+
   map.on("popupopen", function (e) {
     const container = e.popup.getElement();
     if (!container) return;
 
     const editBtn = container.querySelector(".edit-hospital");
     const delBtn = container.querySelector(".delete-hospital");
+    const editStudentBtn = container.querySelector(".edit-student");
+    const delStudentBtn = container.querySelector(".delete-student");
 
+    // Handle Student Edit
+    if (editStudentBtn) {
+      editStudentBtn.addEventListener("click", () => {
+        const fid = editStudentBtn.dataset.fid;
+        const feature = studentManager.getFeature(fid);
+        if (!feature) return alert("ไม่พบข้อมูล");
+
+        studentForm.elements["s_id"].value = feature.properties.s_id || "";
+        studentForm.elements["s_name"].value = feature.properties.s_name || "";
+        studentForm.elements["curriculum"].value =
+          feature.properties.curriculum || "";
+        studentForm.elements["department"].value =
+          feature.properties.department || "";
+        studentForm.elements["faculty"].value =
+          feature.properties.faculty || "";
+        studentForm.elements["graduated_from"].value =
+          feature.properties.graduated_from || "";
+        studentForm.elements["subdistrict"].value =
+          feature.properties.subdistrict || "";
+        studentForm.elements["district"].value =
+          feature.properties.district || "";
+        studentForm.elements["province"].value =
+          feature.properties.province || "";
+
+        if (feature.geometry && feature.geometry.coordinates) {
+          studentForm.elements["lat"].value = feature.geometry.coordinates[1];
+          studentForm.elements["lon"].value = feature.geometry.coordinates[0];
+        }
+
+        document.getElementById("student-form-mode").value = "update";
+        document.getElementById("student-form-fid").value = fid;
+        document.getElementById("student-form-submit").textContent =
+          "บันทึกการแก้ไข";
+        studentFormCancelBtn.style.display = "inline-block";
+        map.closePopup();
+      });
+    }
+
+    // Handle Student Delete
+    if (delStudentBtn) {
+      delStudentBtn.addEventListener("click", async () => {
+        const fid = delStudentBtn.dataset.fid;
+        if (!confirm("ลบรายการนี้จริงหรือไม่?")) return;
+
+        try {
+          await geoServerAPI.deleteStudent(fid);
+          studentMsg.textContent = "ลบเรียบร้อย";
+          studentMsg.style.color = "#10b981";
+          setTimeout(() => {
+            studentMsg.textContent = "";
+          }, 3000);
+          await studentManager.loadStudents();
+        } catch (err) {
+          studentMsg.textContent = "ลบไม่สำเร็จ: " + err.message;
+          studentMsg.style.color = "#ef4444";
+        }
+      });
+    }
+
+    // Handle Hospital Edit
     if (editBtn) {
       editBtn.addEventListener("click", () => {
         const fid = editBtn.dataset.fid;
@@ -272,6 +391,7 @@ document.addEventListener("DOMContentLoaded", function () {
         form.elements["name_en"].value = feature.properties.name_en || "";
         form.elements["district"].value = feature.properties.district || "";
         form.elements["address"].value = feature.properties.address || "";
+        form.elements["source"].value = feature.properties.source || "";
 
         if (feature.geometry && feature.geometry.coordinates) {
           form.elements["lat"].value = feature.geometry.coordinates[1];
@@ -317,6 +437,7 @@ document.addEventListener("DOMContentLoaded", function () {
       name_en: data.get("name_en") || "",
       district: data.get("district") || "",
       address: data.get("address") || "",
+      source: data.get("source") || "",
     };
     const lat = parseFloat(data.get("lat"));
     const lon = parseFloat(data.get("lon"));
@@ -350,4 +471,54 @@ document.addEventListener("DOMContentLoaded", function () {
       msg.style.color = "#ef4444";
     }
   });
+
+  // Student Form Submit
+  if (studentForm) {
+    studentForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = new FormData(studentForm);
+      const properties = {
+        s_id: data.get("s_id") || "",
+        s_name: data.get("s_name") || "",
+        curriculum: data.get("curriculum") || "",
+        department: data.get("department") || "",
+        faculty: data.get("faculty") || "",
+        graduated_from: data.get("graduated_from") || "",
+        subdistrict: data.get("subdistrict") || "",
+        district: data.get("district") || "",
+        province: data.get("province") || "",
+      };
+      const lat = parseFloat(data.get("lat"));
+      const lon = parseFloat(data.get("lon"));
+      const coordinates = [lon, lat];
+      const mode = data.get("mode") || "insert";
+      const fid = data.get("fid") || "";
+
+      try {
+        if (mode === "insert") {
+          await geoServerAPI.insertStudent(properties, coordinates);
+          studentMsg.textContent = "เพิ่มนักเรียนเรียบร้อย ✓";
+        } else {
+          await geoServerAPI.updateStudent(fid, properties, coordinates);
+          studentMsg.textContent = "แก้ไขเรียบร้อย ✓";
+        }
+        studentMsg.style.color = "#10b981";
+
+        studentForm.reset();
+        document.getElementById("student-form-mode").value = "insert";
+        document.getElementById("student-form-fid").value = "";
+        document.getElementById("student-form-submit").textContent =
+          "Add Student";
+        studentFormCancelBtn.style.display = "none";
+
+        setTimeout(() => {
+          studentMsg.textContent = "";
+        }, 3000);
+        await studentManager.loadStudents();
+      } catch (err) {
+        studentMsg.textContent = "เกิดข้อผิดพลาด: " + err.message;
+        studentMsg.style.color = "#ef4444";
+      }
+    });
+  }
 });

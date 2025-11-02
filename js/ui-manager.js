@@ -4,36 +4,16 @@
 class UIManager {
   constructor() {
     this.activeLayersDisplay = document.getElementById("active-layers-display");
-    this.loadingOverlay = document.getElementById("loading-overlay");
-    this.loadingText = document.getElementById("loading-text");
-    this.loadingDetail = document.getElementById("loading-detail");
     this.regionContainer = document.getElementById("region-selector-container");
 
     this.layerStates = {
       hospitals: false,
+      students: false,
       weather: false,
       flood: false,
       air: false,
       quakes: false,
     };
-  }
-
-  // แสดง loading overlay
-  showLoading(text = "กำลังโหลดข้อมูล...", detail = "") {
-    if (this.loadingOverlay) {
-      this.loadingOverlay.classList.remove("hidden");
-      this.loadingOverlay.classList.add("flex");
-    }
-    if (this.loadingText) this.loadingText.textContent = text;
-    if (this.loadingDetail) this.loadingDetail.textContent = detail;
-  }
-
-  // ซ่อน loading overlay
-  hideLoading() {
-    if (this.loadingOverlay) {
-      this.loadingOverlay.classList.add("hidden");
-      this.loadingOverlay.classList.remove("flex");
-    }
   }
 
   // อัปเดตสถานะ layer
@@ -49,6 +29,7 @@ class UIManager {
       .map(([name, _]) => {
         const displayNames = {
           hospitals: "โรงพยาบาล",
+          students: "นักเรียน",
           weather: "สภาพอากาศ",
           flood: "UV Index",
           air: "คุณภาพอากาศ",

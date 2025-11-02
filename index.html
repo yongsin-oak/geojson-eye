@@ -27,41 +27,20 @@
     <script>
       tailwind.config = {
         darkMode: "class",
-        theme: {
-          extend: {
-            colors: {
-              dark: {
-                bg: "#0f1724",
-                panel: "#1a2332",
-                border: "#2d3748",
-              },
-            },
-          },
-        },
       };
     </script>
-    <style type="text/tailwindcss">
-      @layer utilities {
-        .glass {
-          @apply bg-white/5 backdrop-blur-md border border-white/10;
-        }
-        .glass-hover {
-          @apply hover:bg-white/10 transition-all duration-200;
-        }
-      }
-    </style>
   </head>
-  <body
-    class="dark bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-100 font-['Inter']"
-  >
+  <body class="dark bg-slate-900 text-gray-100 font-['Inter']">
     <div class="h-screen grid grid-cols-[280px_1fr_380px] gap-4 p-4">
       <!-- Left Panel - Legend -->
-      <aside class="glass rounded-2xl p-6 flex flex-col gap-6 shadow-2xl">
+      <aside
+        class="bg-slate-800 rounded-2xl p-6 flex flex-col gap-6 border border-slate-700"
+      >
         <div class="text-center">
           <h1
             class="text-2xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
           >
-            GeoJSON Eye
+            GeoJSON
           </h1>
           <p class="text-xs text-gray-400 mt-1">ระบบแผนที่ข้อมูล GIS</p>
         </div>
@@ -93,7 +72,11 @@
               <i
                 class="fa-solid fa-hospital w-4 text-center text-fuchsia-400"
               ></i>
-              <span class="text-gray-300">โรงพยาบาล (สีม่วง)</span>
+              <span class="text-gray-300">โรงพยาบาล</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <i class="fa-solid fa-user w-4 text-center text-blue-400"></i>
+              <span class="text-gray-300">นักเรียน</span>
             </div>
             <div class="flex items-center gap-2 text-xs">
               <div
@@ -187,12 +170,14 @@
       </aside>
 
       <!-- Map Area -->
-      <main class="glass rounded-2xl overflow-hidden shadow-2xl relative">
+      <main
+        class="bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 relative"
+      >
         <div id="map" class="w-full h-full"></div>
 
         <!-- Active Layers Panel (ย้ายไปซ้ายบน) -->
         <div
-          class="absolute top-4 left-4 glass rounded-xl p-3 max-w-xs shadow-xl"
+          class="absolute top-4 left-4 bg-slate-800 rounded-xl p-3 max-w-xs border border-slate-700"
         >
           <div
             class="text-xs font-semibold text-gray-300 mb-2 flex items-center gap-2"
@@ -219,47 +204,17 @@
             <div class="text-gray-500 italic">ไม่มี layer ที่เปิด</div>
           </div>
         </div>
-
-        <!-- Loading Overlay -->
-        <div
-          id="loading-overlay"
-          class="absolute inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50"
-        >
-          <div class="glass rounded-2xl p-6 text-center">
-            <svg
-              class="animate-spin h-12 w-12 mx-auto mb-4 text-indigo-400"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            <div class="text-white font-medium" id="loading-text">
-              กำลังโหลดข้อมูล...
-            </div>
-            <div class="text-gray-400 text-sm mt-1" id="loading-detail"></div>
-          </div>
-        </div>
       </main>
 
       <!-- Right Panel -->
       <aside
-        class="glass rounded-2xl p-6 flex flex-col gap-6 shadow-2xl overflow-y-auto"
+        class="bg-slate-800 rounded-2xl p-6 flex flex-col gap-6 border border-slate-700 overflow-y-auto"
       >
         <!-- Region Selector (แสดงเฉพาะเมื่อเปิด layer ที่เกี่ยวข้อง) -->
-        <div id="region-selector-container" class="glass rounded-xl p-4 hidden">
+        <div
+          id="region-selector-container"
+          class="bg-slate-700 rounded-xl p-4 border border-slate-600 hidden"
+        >
           <label
             class="text-xs font-medium text-gray-400 uppercase tracking-wide block mb-2"
           >
@@ -279,18 +234,21 @@
           </select>
         </div>
 
-        <div class="glass rounded-xl p-4">
-          <h4 class="font-semibold mb-3 text-sm">ค้นหา / กรอง</h4>
+        <div class="bg-slate-700 rounded-xl p-4 border border-slate-600">
+          <h4 class="font-semibold mb-3 text-sm">
+            <i class="fa-solid fa-hospital mr-1 text-fuchsia-400"></i>
+            ค้นหาโรงพยาบาล
+          </h4>
           <div class="grid grid-cols-2 gap-2 mb-3">
             <input
               id="filter-name"
               type="text"
               placeholder="ชื่อโรงพยาบาล"
-              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             <select
               id="filter-district"
-              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent cursor-pointer"
             >
               <option value="">-- ทุกอำเภอ --</option>
             </select>
@@ -298,13 +256,49 @@
           <div class="flex gap-2">
             <button
               id="btn-apply-filter"
-              class="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-medium transition-colors"
+              class="flex-1 px-3 py-2 bg-indigo-600 rounded-lg text-sm font-medium"
             >
               Apply
             </button>
             <button
               id="btn-clear-filter"
-              class="px-3 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm transition-colors"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Student Search Form -->
+        <div class="bg-slate-700 rounded-xl p-4 border border-slate-600">
+          <h4 class="font-semibold mb-3 text-sm">
+            <i class="fa-solid fa-user mr-1 text-blue-400"></i>
+            ค้นหานักเรียน
+          </h4>
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <input
+              id="student-filter-name"
+              type="text"
+              placeholder="ชื่อนักเรียน"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <input
+              id="student-filter-id"
+              type="text"
+              placeholder="รหัสนักเรียน"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+          <div class="flex gap-2">
+            <button
+              id="btn-apply-student-filter"
+              class="flex-1 px-3 py-2 bg-blue-600 rounded-lg text-sm font-medium"
+            >
+              Apply
+            </button>
+            <button
+              id="btn-clear-student-filter"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm"
             >
               Clear
             </button>
@@ -312,7 +306,7 @@
         </div>
 
         <!-- Add Hospital Form -->
-        <div class="glass rounded-xl p-4">
+        <div class="bg-slate-700 rounded-xl p-4 border border-slate-600">
           <h4 class="font-semibold mb-3 text-sm">เพิ่มโรงพยาบาลใหม่</h4>
           <form id="hospital-form" class="grid grid-cols-2 gap-2">
             <input
@@ -326,12 +320,12 @@
               type="text"
               name="name_en"
               placeholder="ชื่ออังกฤษ"
-              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
             <select
               name="district"
               id="form-district"
-              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 cursor-pointer"
             >
               <option value="">-- เลือกอำเภอ --</option>
             </select>
@@ -339,7 +333,13 @@
               type="text"
               name="address"
               placeholder="ที่อยู่"
-              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="source"
+              placeholder="แหล่งที่มา"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="number"
@@ -347,7 +347,7 @@
               name="lat"
               placeholder="Latitude"
               required
-              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="number"
@@ -355,13 +355,7 @@
               name="lon"
               placeholder="Longitude"
               required
-              class="px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
-            />
-            <input
-              type="text"
-              name="source"
-              placeholder="แหล่งที่มา"
-              class="col-span-2 px-3 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
             />
             <input type="hidden" name="mode" id="form-mode" value="insert" />
             <input type="hidden" name="fid" id="form-fid" value="" />
@@ -369,20 +363,125 @@
               <button
                 type="button"
                 id="form-cancel"
-                class="px-3 py-2 bg-slate-700/50 hover:bg-slate-700 border border-slate-600 rounded-lg text-sm transition-colors hidden"
+                class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm hidden"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 id="form-submit"
-                class="flex-1 px-3 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg text-sm font-medium transition-all shadow-lg"
+                class="flex-1 px-3 py-2 bg-indigo-600 rounded-lg text-sm font-medium"
               >
                 Add Hospital
               </button>
             </div>
           </form>
           <div id="form-msg" class="mt-2 text-xs text-red-400">&nbsp;</div>
+        </div>
+
+        <!-- Add Student Form -->
+        <div class="bg-slate-700 rounded-xl p-4 border border-slate-600">
+          <h4 class="font-semibold mb-3 text-sm">เพิ่มนักเรียนใหม่</h4>
+          <form id="student-form" class="grid grid-cols-2 gap-2">
+            <input
+              type="text"
+              name="s_id"
+              placeholder="รหัสนักเรียน"
+              required
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="s_name"
+              placeholder="ชื่อ-นามสกุล"
+              required
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="curriculum"
+              placeholder="หลักสูตร"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="department"
+              placeholder="ภาควิชา"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="faculty"
+              placeholder="คณะ"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="graduated_from"
+              placeholder="จบจากโรงเรียน"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="subdistrict"
+              placeholder="ตำบล"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="district"
+              placeholder="อำเภอ"
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="text"
+              name="province"
+              placeholder="จังหวัด"
+              class="col-span-2 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="number"
+              step="any"
+              name="lat"
+              placeholder="Latitude"
+              required
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="number"
+              step="any"
+              name="lon"
+              placeholder="Longitude"
+              required
+              class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+            />
+            <input
+              type="hidden"
+              name="mode"
+              id="student-form-mode"
+              value="insert"
+            />
+            <input type="hidden" name="fid" id="student-form-fid" value="" />
+            <div class="col-span-2 flex gap-2 mt-2">
+              <button
+                type="button"
+                id="student-form-cancel"
+                class="px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-sm hidden"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                id="student-form-submit"
+                class="flex-1 px-3 py-2 bg-indigo-600 rounded-lg text-sm font-medium"
+              >
+                Add Student
+              </button>
+            </div>
+          </form>
+          <div id="student-form-msg" class="mt-2 text-xs text-red-400">
+            &nbsp;
+          </div>
         </div>
       </aside>
     </div>
@@ -404,6 +503,7 @@
     <script src="js/auth.js"></script>
     <script src="js/geoserver-api.js"></script>
     <script src="js/hospital-manager.js"></script>
+    <script src="js/student-manager.js"></script>
     <script src="js/weather-manager.js"></script>
     <script src="js/uv-manager.js"></script>
     <script src="js/air-quality-manager.js"></script>

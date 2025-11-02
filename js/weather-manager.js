@@ -28,10 +28,6 @@ class WeatherManager {
 
   async loadWeatherForecast() {
     try {
-      this.uiManager.showLoading(
-        "กำลังโหลดสภาพอากาศปัจจุบัน",
-        "กรุณารอสักครู่..."
-      );
       this.weatherLayer.clearLayers();
 
       const provinces = getProvincesByRegion(this.currentRegion);
@@ -45,7 +41,6 @@ class WeatherManager {
           this.currentRegion
         );
         cachedMarkers.forEach((marker) => this.weatherLayer.addLayer(marker));
-        this.uiManager.hideLoading();
         return;
       }
 
@@ -188,10 +183,8 @@ class WeatherManager {
       });
 
       this.cacheManager.set("weather", this.currentRegion, validMarkers);
-      this.uiManager.hideLoading();
       console.log(`โหลดสภาพอากาศปัจจุบัน: ${provinces.length} จังหวัด`);
     } catch (err) {
-      this.uiManager.hideLoading();
       console.error("Current Weather API error:", err);
     }
   }

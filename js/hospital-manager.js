@@ -34,18 +34,12 @@ class HospitalManager {
   }
 
   async loadHospitals(filter = null) {
-    this.uiManager.showLoading("กำลังโหลดข้อมูลโรงพยาบาล...", "กรุณารอสักครู่");
 
     try {
       const data = await geoServerAPI.fetchHospitals(filter);
 
       this.hospitalsLayer.clearLayers();
       this.fidToFeature.clear();
-
-      if (!data || !data.features || data.features.length === 0) {
-        this.uiManager.hideLoading();
-        return;
-      }
 
       data.features.forEach((feature) => {
         const fid = feature.id || (feature.properties && feature.properties.id);
@@ -76,10 +70,8 @@ class HospitalManager {
         this.hospitalsLayer.addLayer(marker);
       });
 
-      this.uiManager.hideLoading();
     } catch (error) {
       console.error("Error loading hospitals:", error);
-      this.uiManager.hideLoading();
     }
   }
 

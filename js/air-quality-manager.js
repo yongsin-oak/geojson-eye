@@ -13,10 +13,6 @@ class AirQualityManager {
 
   async loadAirQuality() {
     try {
-      this.uiManager.showLoading(
-        "กำลังโหลดคุณภาพอากาศ",
-        "ตรวจสอบ PM2.5, PM10, AQI..."
-      );
       this.airLayer.clearLayers();
       const provinces = getProvincesByRegion(this.currentRegion);
       console.log(`กำลังโหลดคุณภาพอากาศ ${provinces.length} จังหวัด...`);
@@ -26,7 +22,6 @@ class AirQualityManager {
         console.log(`ใช้ cache คุณภาพอากาศ (${this.currentRegion})`);
         const cachedCircles = this.cacheManager.get("air", this.currentRegion);
         cachedCircles.forEach((circle) => this.airLayer.addLayer(circle));
-        this.uiManager.hideLoading();
         return;
       }
 
@@ -128,15 +123,13 @@ class AirQualityManager {
       const validCircles = circles.filter((c) => c !== null);
 
       validCircles.forEach((circle) => {
-        if (circle) this.airLayer.addLayer(circle);
+        this.airLayer.addLayer(circle);
       });
 
       this.cacheManager.set("air", this.currentRegion, validCircles);
 
-      this.uiManager.hideLoading();
       console.log(`โหลดคุณภาพอากาศ: ${provinces.length} จังหวัด`);
     } catch (err) {
-      this.uiManager.hideLoading();
       console.error("Air Quality API error:", err);
     }
   }

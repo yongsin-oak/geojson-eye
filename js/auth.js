@@ -7,12 +7,6 @@ class AuthManager {
     this.LOGIN_ENDPOINT = `${this.GEOSERVER_URL}/j_spring_security_check`;
   }
 
-  /**
-   * Login to GeoServer using Spring Security
-   * @param {string} username - GeoServer username
-   * @param {string} password - GeoServer password
-   * @returns {Promise<{success: boolean, error?: string}>}
-   */
   async login(username, password) {
     try {
       const formData = new URLSearchParams();
@@ -31,7 +25,6 @@ class AuthManager {
       // Spring Security redirects on success, returns error page on failure
       // Check if we got redirected or got error page
       if (response.ok || response.redirected) {
-        // Store username for display
         sessionStorage.setItem("geoserver_user", username);
         return { success: true };
       } else {
@@ -49,9 +42,6 @@ class AuthManager {
     }
   }
 
-  /**
-   * Logout from GeoServer
-   */
   async logout() {
     try {
       await fetch(`${this.GEOSERVER_URL}/j_spring_security_logout`, {
@@ -66,10 +56,6 @@ class AuthManager {
     }
   }
 
-  /**
-   * Check if user is authenticated by testing a GeoServer API call
-   * @returns {Promise<boolean>}
-   */
   async checkAuth() {
     try {
       const response = await fetch(
@@ -85,17 +71,10 @@ class AuthManager {
     }
   }
 
-  /**
-   * Get current logged in username
-   * @returns {string|null}
-   */
   getUsername() {
     return sessionStorage.getItem("geoserver_user");
   }
 
-  /**
-   * Show login required alert
-   */
   showLoginRequired() {
     alert("กรุณาเข้าสู่ระบบก่อนใช้งานฟีเจอร์นี้");
     window.location.href = "login.html";

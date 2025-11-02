@@ -4,15 +4,12 @@
 class GeoServerAPI {
   constructor() {
     this.GEOSERVER_URL = "http://localhost:8080/geoserver";
-    this.HOSPITAL_WORKSPACE = "hospital_ws";
-    this.HOSPITAL_LAYER = "hospital_ws:hospitals";
+    this.HOSPITAL_WORKSPACE = "db_gis";
+    this.HOSPITAL_LAYER = "db_gis:hospitals";
+    this.STUDENT_WORKSPACE = "db_gis";
+    this.STUDENT_LAYER = "db_gis:students";
   }
 
-  /**
-   * Fetch hospitals from GeoServer WFS
-   * @param {Object} filter - Optional filter {name, district}
-   * @returns {Promise<Object>} GeoJSON FeatureCollection
-   */
   async fetchHospitals(filter = null) {
     try {
       let url;
@@ -59,56 +56,91 @@ class GeoServerAPI {
     }
   }
 
-  /**
-   * Insert a new hospital feature via WFS-T
-   * @param {Object} properties - Hospital properties
-   * @param {Array} coordinates - [lng, lat]
-   * @returns {Promise<Object>} Response with success status
-   */
   async insertHospital(properties, coordinates) {
     const xml = this.buildInsertXml(properties, coordinates);
-    return await this.postWFST(xml);
+    return await this.postWFST(xml, this.HOSPITAL_WORKSPACE);
   }
 
-  /**
-   * Update an existing hospital feature via WFS-T
-   * @param {string} fid - Feature ID
-   * @param {Object} properties - Updated properties
-   * @param {Array} coordinates - [lng, lat]
-   * @returns {Promise<Object>} Response with success status
-   */
   async updateHospital(fid, properties, coordinates) {
     const xml = this.buildUpdateXml(fid, properties, coordinates);
-    return await this.postWFST(xml);
+    return await this.postWFST(xml, this.HOSPITAL_WORKSPACE);
   }
 
-  /**
-   * Delete a hospital feature via WFS-T
-   * @param {string} fid - Feature ID
-   * @returns {Promise<Object>} Response with success status
-   */
   async deleteHospital(fid) {
-    const xml = this.buildDeleteXml(fid);
-    return await this.postWFST(xml);
+    const xml = this.buildDeleteXml(fid, this.HOSPITAL_LAYER);
+    return await this.postWFST(xml, this.HOSPITAL_WORKSPACE);
   }
 
-  /**
-   * Post WFS-T request to GeoServer
-   * @private
-   */
-  async postWFST(xml) {
+  // ==================== STUDENTS ====================
+
+  async fetchStudents(filter = null) {
     try {
-      const response = await fetch(
-        `${this.GEOSERVER_URL}/${this.HOSPITAL_WORKSPACE}/ows`,
-        {
+      let url;
+      let options = {
+        method: "GET",
+        credentials: "include",
+      };
+
+      if (filter && (filter.s_name || filter.district || filter.province)) {
+        url = `${this.GEOSERVER_URL}/${this.STUDENT_WORKSPACE}/ows`;
+        const xml = this.buildGetFeatureXmlStudents(filter);
+        options = {
           method: "POST",
           credentials: "include",
           headers: {
             "Content-Type": "application/xml",
           },
           body: xml,
+        };
+      } else {
+        url = `${this.GEOSERVER_URL}/${this.STUDENT_WORKSPACE}/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=${this.STUDENT_LAYER}&outputFormat=application/json`;
+      }
+
+      const response = await fetch(url, options);
+
+      if (response.status === 401 || response.status === 404) {
+        if (typeof authManager !== "undefined") {
+          authManager.showLoginRequired();
         }
-      );
+        throw new Error("Authentication required");
+      }
+
+      if (!response.ok) {
+        throw new Error(`GeoServer error: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      throw error;
+    }
+  }
+
+  async insertStudent(properties, coordinates) {
+    const xml = this.buildInsertXmlStudent(properties, coordinates);
+    return await this.postWFST(xml, this.STUDENT_WORKSPACE);
+  }
+
+  async updateStudent(fid, properties, coordinates) {
+    const xml = this.buildUpdateXmlStudent(fid, properties, coordinates);
+    return await this.postWFST(xml, this.STUDENT_WORKSPACE);
+  }
+
+  async deleteStudent(fid) {
+    const xml = this.buildDeleteXml(fid, this.STUDENT_LAYER);
+    return await this.postWFST(xml, this.STUDENT_WORKSPACE);
+  }
+
+  async postWFST(xml, workspace) {
+    try {
+      const response = await fetch(`${this.GEOSERVER_URL}/${workspace}/ows`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/xml",
+        },
+        body: xml,
+      });
 
       if (response.status === 401 || response.status === 404) {
         if (typeof authManager !== "undefined") {
@@ -125,10 +157,6 @@ class GeoServerAPI {
     }
   }
 
-  /**
-   * Build GetFeature XML with filter
-   * @private
-   */
   buildGetFeatureXml(filter) {
     const esc = (v) => this.escapeXml(String(v || ""));
     const escapeCQL = (s) => {
@@ -170,17 +198,13 @@ class GeoServerAPI {
   xmlns:wfs="http://www.opengis.net/wfs"
   xmlns:ogc="http://www.opengis.net/ogc"
   xmlns:gml="http://www.opengis.net/gml"
-  xmlns:hospital_ws="http://hospital_ws">
+  xmlns:db_gis="http://db_gis">
   <wfs:Query typeName="${this.HOSPITAL_LAYER}">
     ${filterXml}
   </wfs:Query>
 </wfs:GetFeature>`;
   }
 
-  /**
-   * Build Insert XML for WFS-T
-   * @private
-   */
   buildInsertXml(properties, coordinates) {
     const esc = (v) => this.escapeXml(String(v || ""));
     const [lng, lat] = coordinates;
@@ -189,27 +213,24 @@ class GeoServerAPI {
 <wfs:Transaction service="WFS" version="1.0.0"
   xmlns:wfs="http://www.opengis.net/wfs"
   xmlns:gml="http://www.opengis.net/gml"
-  xmlns:hospital_ws="http://hospital_ws">
+  xmlns:db_gis="http://db_gis">
   <wfs:Insert>
-    <hospital_ws:hospitals>
-      <hospital_ws:name_th>${esc(properties.name_th)}</hospital_ws:name_th>
-      <hospital_ws:name_en>${esc(properties.name_en)}</hospital_ws:name_en>
-      <hospital_ws:district>${esc(properties.district)}</hospital_ws:district>
-      <hospital_ws:address>${esc(properties.address)}</hospital_ws:address>
-      <hospital_ws:geom>
+    <db_gis:hospitals>
+      <db_gis:name_th>${esc(properties.name_th)}</db_gis:name_th>
+      <db_gis:name_en>${esc(properties.name_en)}</db_gis:name_en>
+      <db_gis:district>${esc(properties.district)}</db_gis:district>
+      <db_gis:address>${esc(properties.address)}</db_gis:address>
+      <db_gis:source>${esc(properties.source)}</db_gis:source>
+      <db_gis:geom>
         <gml:Point srsName="EPSG:4326">
           <gml:coordinates>${lng},${lat}</gml:coordinates>
         </gml:Point>
-      </hospital_ws:geom>
-    </hospital_ws:hospitals>
+      </db_gis:geom>
+    </db_gis:hospitals>
   </wfs:Insert>
 </wfs:Transaction>`;
   }
 
-  /**
-   * Build Update XML for WFS-T
-   * @private
-   */
   buildUpdateXml(fid, properties, coordinates) {
     const esc = (v) => this.escapeXml(String(v || ""));
     const [lng, lat] = coordinates;
@@ -219,7 +240,7 @@ class GeoServerAPI {
   xmlns:wfs="http://www.opengis.net/wfs"
   xmlns:gml="http://www.opengis.net/gml"
   xmlns:ogc="http://www.opengis.net/ogc"
-  xmlns:hospital_ws="http://hospital_ws">
+  xmlns:db_gis="http://db_gis">
   <wfs:Update typeName="${this.HOSPITAL_LAYER}">
     <wfs:Property>
       <wfs:Name>name_th</wfs:Name>
@@ -238,6 +259,10 @@ class GeoServerAPI {
       <wfs:Value>${esc(properties.address)}</wfs:Value>
     </wfs:Property>
     <wfs:Property>
+      <wfs:Name>source</wfs:Name>
+      <wfs:Value>${esc(properties.source)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
       <wfs:Name>geom</wfs:Name>
       <wfs:Value>
         <gml:Point srsName="EPSG:4326">
@@ -252,19 +277,15 @@ class GeoServerAPI {
 </wfs:Transaction>`;
   }
 
-  /**
-   * Build Delete XML for WFS-T
-   * @private
-   */
-  buildDeleteXml(fid) {
+  buildDeleteXml(fid, layerName) {
     const esc = (v) => this.escapeXml(String(v || ""));
 
     return `<?xml version="1.0"?>
 <wfs:Transaction service="WFS" version="1.0.0"
   xmlns:wfs="http://www.opengis.net/wfs"
   xmlns:ogc="http://www.opengis.net/ogc"
-  xmlns:hospital_ws="http://hospital_ws">
-  <wfs:Delete typeName="${this.HOSPITAL_LAYER}">
+  xmlns:db_gis="http://db_gis">
+  <wfs:Delete typeName="${layerName}">
     <ogc:Filter>
       <ogc:FeatureId fid="${esc(fid)}"/>
     </ogc:Filter>
@@ -272,10 +293,158 @@ class GeoServerAPI {
 </wfs:Transaction>`;
   }
 
-  /**
-   * Escape XML special characters
-   * @private
-   */
+  // ==================== STUDENTS BUILD XML METHODS ====================
+
+  buildGetFeatureXmlStudents(filter) {
+    const esc = (v) => this.escapeXml(String(v || ""));
+    const escapeCQL = (s) => {
+      if (!s) return "";
+      return String(s).replace(/'/g, "''");
+    };
+
+    let filterXml = "";
+    if (filter) {
+      const conditions = [];
+      if (filter.s_name) {
+        conditions.push(
+          `<ogc:PropertyIsLike wildCard="*" singleChar="." escape="!">
+            <ogc:PropertyName>s_name</ogc:PropertyName>
+            <ogc:Literal>*${escapeCQL(filter.s_name)}*</ogc:Literal>
+          </ogc:PropertyIsLike>`
+        );
+      }
+      if (filter.district) {
+        conditions.push(
+          `<ogc:PropertyIsEqualTo>
+            <ogc:PropertyName>district</ogc:PropertyName>
+            <ogc:Literal>${esc(filter.district)}</ogc:Literal>
+          </ogc:PropertyIsEqualTo>`
+        );
+      }
+      if (filter.province) {
+        conditions.push(
+          `<ogc:PropertyIsEqualTo>
+            <ogc:PropertyName>province</ogc:PropertyName>
+            <ogc:Literal>${esc(filter.province)}</ogc:Literal>
+          </ogc:PropertyIsEqualTo>`
+        );
+      }
+
+      if (conditions.length === 1) {
+        filterXml = `<ogc:Filter>${conditions[0]}</ogc:Filter>`;
+      } else if (conditions.length > 1) {
+        filterXml = `<ogc:Filter><ogc:And>${conditions.join(
+          ""
+        )}</ogc:And></ogc:Filter>`;
+      }
+    }
+
+    return `<?xml version="1.0"?>
+<wfs:GetFeature service="WFS" version="1.0.0"
+  xmlns:wfs="http://www.opengis.net/wfs"
+  xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:gml="http://www.opengis.net/gml"
+  xmlns:db_gis="http://db_gis">
+  <wfs:Query typeName="${this.STUDENT_LAYER}">
+    ${filterXml}
+  </wfs:Query>
+</wfs:GetFeature>`;
+  }
+
+  buildInsertXmlStudent(properties, coordinates) {
+    const esc = (v) => this.escapeXml(String(v || ""));
+    const [lng, lat] = coordinates;
+
+    return `<?xml version="1.0"?>
+<wfs:Transaction service="WFS" version="1.0.0"
+  xmlns:wfs="http://www.opengis.net/wfs"
+  xmlns:gml="http://www.opengis.net/gml"
+  xmlns:db_gis="http://db_gis">
+  <wfs:Insert>
+    <db_gis:students>
+      <db_gis:s_id>${esc(properties.s_id)}</db_gis:s_id>
+      <db_gis:s_name>${esc(properties.s_name)}</db_gis:s_name>
+      <db_gis:curriculum>${esc(properties.curriculum)}</db_gis:curriculum>
+      <db_gis:department>${esc(properties.department)}</db_gis:department>
+      <db_gis:faculty>${esc(properties.faculty)}</db_gis:faculty>
+      <db_gis:graduated_from>${esc(
+        properties.graduated_from
+      )}</db_gis:graduated_from>
+      <db_gis:subdistrict>${esc(properties.subdistrict)}</db_gis:subdistrict>
+      <db_gis:district>${esc(properties.district)}</db_gis:district>
+      <db_gis:province>${esc(properties.province)}</db_gis:province>
+      <db_gis:geom>
+        <gml:Point srsName="EPSG:4326">
+          <gml:coordinates>${lng},${lat}</gml:coordinates>
+        </gml:Point>
+      </db_gis:geom>
+    </db_gis:students>
+  </wfs:Insert>
+</wfs:Transaction>`;
+  }
+
+  buildUpdateXmlStudent(fid, properties, coordinates) {
+    const esc = (v) => this.escapeXml(String(v || ""));
+    const [lng, lat] = coordinates;
+
+    return `<?xml version="1.0"?>
+<wfs:Transaction service="WFS" version="1.0.0"
+  xmlns:wfs="http://www.opengis.net/wfs"
+  xmlns:gml="http://www.opengis.net/gml"
+  xmlns:ogc="http://www.opengis.net/ogc"
+  xmlns:db_gis="http://db_gis">
+  <wfs:Update typeName="${this.STUDENT_LAYER}">
+    <wfs:Property>
+      <wfs:Name>s_id</wfs:Name>
+      <wfs:Value>${esc(properties.s_id)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>s_name</wfs:Name>
+      <wfs:Value>${esc(properties.s_name)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>curriculum</wfs:Name>
+      <wfs:Value>${esc(properties.curriculum)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>department</wfs:Name>
+      <wfs:Value>${esc(properties.department)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>faculty</wfs:Name>
+      <wfs:Value>${esc(properties.faculty)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>graduated_from</wfs:Name>
+      <wfs:Value>${esc(properties.graduated_from)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>subdistrict</wfs:Name>
+      <wfs:Value>${esc(properties.subdistrict)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>district</wfs:Name>
+      <wfs:Value>${esc(properties.district)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>province</wfs:Name>
+      <wfs:Value>${esc(properties.province)}</wfs:Value>
+    </wfs:Property>
+    <wfs:Property>
+      <wfs:Name>geom</wfs:Name>
+      <wfs:Value>
+        <gml:Point srsName="EPSG:4326">
+          <gml:coordinates>${lng},${lat}</gml:coordinates>
+        </gml:Point>
+      </wfs:Value>
+    </wfs:Property>
+    <ogc:Filter>
+      <ogc:FeatureId fid="${esc(fid)}"/>
+    </ogc:Filter>
+  </wfs:Update>
+</wfs:Transaction>`;
+  }
+
   escapeXml(unsafe) {
     if (!unsafe) return "";
     return String(unsafe)

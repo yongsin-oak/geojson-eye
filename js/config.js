@@ -13,9 +13,12 @@ const MAP_ZOOM = 6;
 
 // WFS endpoints
 const HOSPITALS_WFS_URL =
-  "http://localhost:8080/geoserver/hospital_ws/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=hospital_ws:hospitals&outputFormat=application/json";
-const HOSPITALS_WFS_ENDPOINT =
-  "http://localhost:8080/geoserver/hospital_ws/ows";
+  "http://localhost:8080/geoserver/db_gis/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=db_gis:hospitals&outputFormat=application/json";
+const HOSPITALS_WFS_ENDPOINT = "http://localhost:8080/geoserver/db_gis/ows";
+
+const STUDENTS_WFS_URL =
+  "http://localhost:8080/geoserver/db_gis/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=db_gis:students&outputFormat=application/json";
+const STUDENTS_WFS_ENDPOINT = "http://localhost:8080/geoserver/db_gis/ows";
 
 // District list (Phitsanulok example)
 const DISTRICTS = [

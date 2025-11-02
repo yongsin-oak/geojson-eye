@@ -8,10 +8,6 @@ class EarthquakeManager {
 
   async loadEarthquakes() {
     try {
-      this.uiManager.showLoading(
-        "กำลังโหลดข้อมูลแผ่นดินไหว",
-        "USGS - 7 วันที่ผ่านมา..."
-      );
       console.log("กำลังโหลดแผ่นดินไหว...");
 
       // ตรวจสอบ cache ก่อน
@@ -20,7 +16,6 @@ class EarthquakeManager {
         this.quakesLayer.clearLayers();
         const cachedData = this.cacheManager.get("quakes", "global");
         this.renderEarthquakes(cachedData);
-        this.uiManager.hideLoading();
         return;
       }
 
@@ -34,10 +29,8 @@ class EarthquakeManager {
       this.quakesLayer.clearLayers();
       this.renderEarthquakes(data);
 
-      this.uiManager.hideLoading();
       console.log(`โหลดแผ่นดินไหว: ${data.features.length} ครั้ง`);
     } catch (err) {
-      this.uiManager.hideLoading();
       console.error("USGS Earthquake API error:", err);
     }
   }
