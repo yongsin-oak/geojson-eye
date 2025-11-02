@@ -1,3 +1,9 @@
+/*
+  Hospital Manager (บทสรุปภาษาไทย)
+  - ดูแลการโหลดและแสดงข้อมูลโรงพยาบาลบนแผนที่
+  - สร้าง marker, popup และจัดการการค้นหา/แก้ไข/ลบข้อมูลผ่าน GeoServer
+  - เหมาะสำหรับผู้ดูแลข้อมูลที่ต้องการเพิ่ม/ปรับข้อมูลสถานพยาบาล
+*/
 // Hospital Layer Manager
 // Handles all hospital-related operations
 
@@ -34,7 +40,6 @@ class HospitalManager {
   }
 
   async loadHospitals(filter = null) {
-
     try {
       const data = await geoServerAPI.fetchHospitals(filter);
 
@@ -46,12 +51,9 @@ class HospitalManager {
         if (fid) this.fidToFeature.set(fid, feature);
 
         const marker = L.geoJSON(feature, {
-          pointToLayer: (feat, latlng) => {
-            const p = feat.properties || {};
-            const name = p.name_th || p.name_en || p.name || "";
-            const isCommunity = name.includes("ชุมชน");
-            const color = isCommunity ? "#10b981" : "#3b82f6";
-            const radius = isCommunity ? 5 : 8;
+          pointToLayer: (_feat, latlng) => {
+            const color = "#3b82f6";
+            const radius = 8;
 
             return L.circleMarker(latlng, {
               radius: radius,
@@ -69,7 +71,6 @@ class HospitalManager {
 
         this.hospitalsLayer.addLayer(marker);
       });
-
     } catch (error) {
       console.error("Error loading hospitals:", error);
     }

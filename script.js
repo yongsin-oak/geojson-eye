@@ -29,6 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   map.createPane("hospitalPane");
   map.createPane("studentPane");
+  map.createPane("provincePane");
+  map.createPane("districtPane");
   map.createPane("weatherPane");
   map.createPane("floodPane");
   map.createPane("airPane");
@@ -36,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   map.getPane("hospitalPane").style.zIndex = 650;
   map.getPane("studentPane").style.zIndex = 645;
+  map.getPane("provincePane").style.zIndex = 390;
+  map.getPane("districtPane").style.zIndex = 400;
   map.getPane("weatherPane").style.zIndex = 640;
   map.getPane("floodPane").style.zIndex = 630;
   map.getPane("airPane").style.zIndex = 620;
@@ -43,6 +47,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const hospitalsLayer = L.layerGroup([], { pane: "hospitalPane" });
   const studentsLayer = L.layerGroup([], { pane: "studentPane" });
+  const provinceLayer = L.layerGroup([], { pane: "provincePane" });
+  const districtLayer = L.layerGroup([], { pane: "districtPane" });
   const weatherLayer = L.layerGroup([], { pane: "weatherPane" });
   const floodLayer = L.layerGroup([], { pane: "floodPane" });
   const airLayer = L.layerGroup([], { pane: "airPane" });
@@ -50,6 +56,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const hospitalManager = new HospitalManager(map, hospitalsLayer, uiManager);
   const studentManager = new StudentManager(map, studentsLayer, uiManager);
+  const provinceManager = new ProvinceManager(map, provinceLayer);
+  const districtManager = new DistrictManager(map, districtLayer);
   const weatherManager = new WeatherManager(
     weatherLayer,
     uiManager,
@@ -107,6 +115,20 @@ document.addEventListener("DOMContentLoaded", function () {
           key: "students",
           layer: studentsLayer,
           loadFn: () => studentManager.loadStudents(),
+        },
+        {
+          name: `<i class="fa-solid fa-map-location-dot"></i>`,
+          title: "เส้นแบ่งจังหวัด",
+          key: "provinces",
+          layer: provinceLayer,
+          loadFn: () => provinceManager.loadProvinces(),
+        },
+        {
+          name: `<i class="fa-solid fa-map"></i>`,
+          title: "เส้นแบ่งอำเภอ",
+          key: "districts",
+          layer: districtLayer,
+          loadFn: () => districtManager.loadDistricts(),
         },
         {
           name: `<i class="fa-solid fa-cloud"></i>`,

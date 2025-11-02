@@ -219,3 +219,41 @@
 .hourly-forecast-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(99, 102, 241, 0.8);
 }
+
+/* ========== District Tooltip Styling ========== */
+.district-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.district-tooltip::before {
+  display: none !important;
+}
+
+.leaflet-tooltip-top.district-tooltip::before,
+.leaflet-tooltip-bottom.district-tooltip::before,
+.leaflet-tooltip-left.district-tooltip::before,
+.leaflet-tooltip-right.district-tooltip::before {
+  display: none !important;
+}
+
+/* ========== Province Tooltip Styling ========== */
+.province-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.province-tooltip::before {
+  display: none !important;
+}
+
+.leaflet-tooltip-top.province-tooltip::before,
+.leaflet-tooltip-bottom.province-tooltip::before,
+.leaflet-tooltip-left.province-tooltip::before,
+.leaflet-tooltip-right.province-tooltip::before {
+  display: none !important;
+}

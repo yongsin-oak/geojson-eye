@@ -9,6 +9,8 @@ class UIManager {
     this.layerStates = {
       hospitals: false,
       students: false,
+      provinces: false,
+      districts: false,
       weather: false,
       flood: false,
       air: false,
@@ -30,6 +32,8 @@ class UIManager {
         const displayNames = {
           hospitals: "โรงพยาบาล",
           students: "นักเรียน",
+          provinces: "เส้นแบ่งจังหวัด",
+          districts: "เส้นแบ่งอำเภอ",
           weather: "สภาพอากาศ",
           flood: "UV Index",
           air: "คุณภาพอากาศ",

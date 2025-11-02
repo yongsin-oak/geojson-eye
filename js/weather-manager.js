@@ -1,3 +1,9 @@
+/*
+  Weather Manager (บทสรุปภาษาไทย)
+  - รับผิดชอบการดึงข้อมูลสภาพอากาศจาก Open-Meteo
+  - แปลงข้อมูลเป็น marker/tooltip บนแผนที่ และแสดงรายละเอียดเมื่อคลิก
+  - เหมาะสำหรับผู้ใช้งานที่ต้องการดูสภาพอากาศปัจจุบันและพยากรณ์รายชั่วโมง
+*/
 // Weather Layer Manager
 // Handles weather forecast data from Open-Meteo API
 

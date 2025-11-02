@@ -1,3 +1,10 @@
+/*
+  GeoServer API Manager (บทสรุปภาษาไทย)
+  - ทำหน้าที่เป็นตัวกลางในการติดต่อกับ GeoServer (WFS / WFS-T)
+  - ใช้สำหรับดึงข้อมูล (GetFeature), เพิ่ม (Insert), แก้ไข (Update), ลบ (Delete)
+  - รับผิดชอบการสร้าง XML สำหรับ WFS-T และจัดการการยืนยันตัวตน
+  - เหมาะสำหรับผู้ที่ต้องการให้เว็บคุยกับ GeoServer โดยไม่ต้องรู้รายละเอียด XML
+*/
 // GeoServer API Manager
 // Handles all WFS/WMS requests to GeoServer with authentication
 
