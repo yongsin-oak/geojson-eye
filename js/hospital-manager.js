@@ -41,12 +41,39 @@ class HospitalManager {
 
   async loadHospitals(filter = null) {
     try {
-      const data = await geoServerAPI.fetchHospitals(filter);
-
+      console.log("กำลังโหลดข้อมูลโรงพยาบาล...", filter);
       this.hospitalsLayer.clearLayers();
       this.fidToFeature.clear();
 
-      data.features.forEach((feature) => {
+      // ดึงข้อมูลจาก GeoServer (ไม่ส่ง filter ไปเพื่อให้ได้ข้อมูลทั้งหมด)
+      const data = await geoServerAPI.fetchHospitals();
+      console.log(`โหลดโรงพยาบาล: ${data.features.length} แห่ง`);
+
+      // Apply client-side filtering
+      let filteredFeatures = data.features;
+      if (filter) {
+        filteredFeatures = data.features.filter((feature) => {
+          const props = feature.properties;
+          let match = true;
+
+          // Filter by name (partial match, case-insensitive)
+          if (filter.name) {
+            const name = (props.name_th || "").toLowerCase();
+            match = match && name.includes(filter.name.toLowerCase());
+          }
+
+          // Filter by district (exact match)
+          if (filter.district) {
+            const district = props.district || "";
+            match = match && district === filter.district;
+          }
+
+          return match;
+        });
+        console.log(`กรองเหลือ: ${filteredFeatures.length} แห่ง`);
+      }
+
+      filteredFeatures.forEach((feature) => {
         const fid = feature.id || (feature.properties && feature.properties.id);
         if (fid) this.fidToFeature.set(fid, feature);
 
