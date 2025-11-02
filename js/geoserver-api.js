@@ -51,6 +51,11 @@ class GeoServerAPI {
 
       return await response.json();
     } catch (error) {
+      if (String(error).includes("SyntaxError: Unexpected token")) {
+        if (typeof authManager !== "undefined") {
+          authManager.showLoginRequired();
+        }
+      }
       console.error("Error fetching hospitals:", error);
       throw error;
     }
