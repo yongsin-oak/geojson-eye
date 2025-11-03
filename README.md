@@ -283,8 +283,6 @@
 - **`AuthManager` class**: จัดการการเข้าสู่ระบบและตรวจสอบสิทธิ์
   - `login(username, password)`: เข้าสู่ระบบผ่าน Spring Security
   - `logout()`: ออกจากระบบ
-  - `checkAuth()`: ตรวจสอบสถานะการเข้าสู่ระบบ
-  - `getUsername()`: ดึงชื่อผู้ใช้ปัจจุบัน
   - `showLoginRequired()`: แสดงแจ้งเตือนให้เข้าสู่ระบบ
 - ใช้ `sessionStorage` เก็บข้อมูลผู้ใช้
 - รองรับ Spring Security form authentication

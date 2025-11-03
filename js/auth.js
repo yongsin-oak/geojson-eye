@@ -55,26 +55,6 @@ class AuthManager {
       window.location.href = "login.html";
     }
   }
-
-  async checkAuth() {
-    try {
-      const response = await fetch(
-        `${this.GEOSERVER_URL}/rest/about/version.json`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  getUsername() {
-    return sessionStorage.getItem("geoserver_user");
-  }
-
   showLoginRequired() {
     alert("กรุณาเข้าสู่ระบบก่อนใช้งานฟีเจอร์นี้");
     window.location.href = "login.html";
